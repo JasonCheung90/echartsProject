@@ -152,6 +152,7 @@ export default {
   },
   destroyed() {
     clearInterval(this.timeInter);
+    window.removeEventListener("resize", this.screenAdapter);
   }
 };
 </script>
