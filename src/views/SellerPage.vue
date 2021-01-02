@@ -9,7 +9,7 @@ import Seller from "@/components/Seller";
 export default {
   name: "SellerPage",
   components: {
-    Seller,
-  },
+    Seller
+  }
 };
 </script>

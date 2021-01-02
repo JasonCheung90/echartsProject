@@ -23,7 +23,48 @@ export default {
   methods: {
     //初始化echarts实例对象
     initChart() {
-      this.chartInstance = this.$echarts.init(this.$refs.sellerRef);
+      this.chartInstance = this.$echarts.init(this.$refs.sellerRef, "chalk");
+      // 对图表初始化配置
+      const initOptions = {
+        title: {
+          text: "商家销售数据统计图",
+          textStyle: {
+            fontSize: 30
+          },
+          top: 20,
+          left: 20
+        },
+        grid: {
+          left: "10%",
+          top: "10%",
+          right: "10%",
+          bottom: "10%"
+        },
+        tooltip: {
+          trigger: "axis",
+          axisPointer: {
+            type: "line",
+            z: 0,
+            lineStyle: {
+              width: 50,
+              color: "#2D3443"
+            }
+          }
+        },
+        xAxis: { type: "value" },
+        yAxis: { type: "category" },
+        series: [
+          {
+            type: "bar",
+            barWidth: 50,
+            label: { show: true, position: "right", color: "white" },
+            itemStyle: {
+              barBorderRadius: [0, 30, 30, 0]
+            }
+          }
+        ]
+      };
+      this.chartInstance.setOption(initOptions);
       this.chartInstance.on("mouseover", () => {
         clearInterval(this.timeInter);
       });
@@ -53,12 +94,15 @@ export default {
       const showData = this.chartData.slice(start, end);
       const sellerName = showData.map(item => item.name);
       const sellerValue = showData.map(item => item.value);
-      const options = {
-        xAxis: { type: "value" },
-        yAxis: { type: "category", data: sellerName },
-        series: [{ type: "bar", data: sellerValue }]
+      const dataOptions = {
+        yAxis: { data: sellerName },
+        series: [
+          {
+            data: sellerValue
+          }
+        ]
       };
-      this.chartInstance.setOption(options);
+      this.chartInstance.setOption(dataOptions);
     },
     // 开启定时器
     startInterval() {
@@ -69,11 +113,42 @@ export default {
         }
         this.upDateChart();
       }, 3000);
+    },
+    // 屏幕适配
+    screenAdapter() {
+      const w = this.$refs.sellerRef.offsetWidth;
+      const titleFontSize = (w / 100) * 3.5;
+      const screenOptions = {
+        title: {
+          textStyle: {
+            fontSize: titleFontSize
+          }
+        },
+        tooltip: {
+          axisPointer: {
+            lineStyle: {
+              width: titleFontSize
+            }
+          }
+        },
+        series: [
+          {
+            barWidth: titleFontSize,
+            itemStyle: {
+              barBorderRadius: [0, titleFontSize / 2, titleFontSize / 2, 0]
+            }
+          }
+        ]
+      };
+      this.chartInstance.setOption(screenOptions);
+      this.chartInstance.resize();
     }
   },
   mounted() {
     this.initChart();
     this.getData();
+    window.addEventListener("resize", this.screenAdapter);
+    this.screenAdapter();
   },
   destroyed() {
     clearInterval(this.timeInter);
